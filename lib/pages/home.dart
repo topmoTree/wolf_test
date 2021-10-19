@@ -13,7 +13,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   List<Moment> moments = MomentApi.getMoments();
 
   @override
@@ -27,17 +26,14 @@ class _HomeState extends State<Home> {
       body: GroupedListView<dynamic, int>(
         elements: moments,
         groupBy: (element) => convertToDateInt((element as Moment).date),
-
         groupSeparatorBuilder: (dateTimeInt) => Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
           child: Text(intConvertToDateTime(dateTimeInt)),
         ),
-
         itemBuilder: (context, dynamic element) {
           var moment = element as Moment;
           return _buildExpandableTile(moment);
         },
-
         itemComparator: (element1, element2) {
           final moment1 = element1 as Moment;
           final moment2 = element2 as Moment;
@@ -60,11 +56,11 @@ class _HomeState extends State<Home> {
     return taken;
   }
 
-  int convertToDateInt(DateTime dateTime){
+  int convertToDateInt(DateTime dateTime) {
     return (dateTime.year * 100 + dateTime.month) * 100 + dateTime.day;
   }
 
-  String intConvertToDateTime(int dateInt){
+  String intConvertToDateTime(int dateInt) {
     int day = dateInt % 100;
     int yearAndMonth = dateInt ~/ 100;
     int month = yearAndMonth % 100;
@@ -73,16 +69,17 @@ class _HomeState extends State<Home> {
     return dateTime.printDate();
   }
 
-  Widget _buildExpandableTile(Moment moment){
+  Widget _buildExpandableTile(Moment moment) {
     return CustomExpansionTile(
-        onExpansionChanged: (value){
+        onExpansionChanged: (value) {
           moment.isCollapsed = !value;
         },
         hasIcon: false,
         initiallyExpanded: !moment.isCollapsed,
         title: Card(
-          color: areAllMedicineTaken(moment.medicines) ? Colors.grey : Colors.white,
-
+          color: areAllMedicineTaken(moment.medicines)
+              ? Colors.grey
+              : Colors.white,
           child: ListTile(
             title: Text(moment.title),
             subtitle: Text(moment.date.printTime()),
@@ -92,14 +89,17 @@ class _HomeState extends State<Home> {
               children: [
                 IconButton(
                   icon: areAllMedicineTaken(moment.medicines)
-                      ? const Icon(Icons.check_box)
+                      ? const Icon(
+                          Icons.check_box,
+                          color: Colors.white,
+                        )
                       : const Icon(Icons.check_box_outline_blank),
-
                   onPressed: () {
-                    final currentTakenState = areAllMedicineTaken(moment.medicines);
+                    final currentTakenState =
+                        areAllMedicineTaken(moment.medicines);
 
                     setState(() {
-                      for (var med in moment.medicines){
+                      for (var med in moment.medicines) {
                         med.taken = !currentTakenState;
                       }
                     });
@@ -109,32 +109,34 @@ class _HomeState extends State<Home> {
             ),
           ),
         ),
-        children: moment.medicines.map((medicine) => _buildMedicineTile(medicine)).toList()
-    );
+        children: moment.medicines
+            .map((medicine) => _buildMedicineTile(medicine))
+            .toList());
   }
 
   Widget _buildMedicineTile(Medicine medicine) {
     return ListTile(
-        title: Padding(
+      title: Padding(
           padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-          child: Text(medicine.name)
-        ),
-        trailing: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
+          child: Text(medicine.name)),
+      trailing: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0),
+            child: IconButton(
               icon: medicine.taken
                   ? const Icon(Icons.check_box)
                   : const Icon(Icons.check_box_outline_blank),
-
               onPressed: () {
                 setState(() {
                   medicine.taken = !medicine.taken;
                 });
               },
-            )
-          ],
-        ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
