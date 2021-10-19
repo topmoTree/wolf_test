@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
-import 'package:intl/intl.dart';
 import 'package:wolf_test/data/moment_api.dart';
 import 'package:wolf_test/utils/date_time_extensions.dart';
 
