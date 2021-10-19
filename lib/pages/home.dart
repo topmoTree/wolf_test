@@ -11,7 +11,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   List<Moment> moments = MomentApi.getMoments();
 
   @override
@@ -25,18 +24,16 @@ class _HomeState extends State<Home> {
       body: GroupedListView<dynamic, int>(
         elements: moments,
         groupBy: (element) => convertToDateInt((element as Moment).date),
-
         groupSeparatorBuilder: (dateTimeInt) => Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+          padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
           child: Text(intConvertToDateTime(dateTimeInt)),
         ),
-
         itemBuilder: (context, dynamic element) {
-
           var moment = element as Moment;
           return Card(
-            color: areAllMedicineTaken(moment.medicines) ? Colors.blueAccent : Colors.white,
-
+            color: isEveryMedicineTaken(moment.medicines)
+                ? Colors.blueAccent
+                : Colors.white,
             child: ListTile(
               title: Text(moment.title),
               subtitle: Text(moment.date.printTime()),
@@ -46,15 +43,16 @@ class _HomeState extends State<Home> {
                 children: [
                   IconButton(
                     //By Assessment: Clicking on the checkbox for the moment simply sets all medicines to the same value
-                    icon: areAllMedicineTaken(moment.medicines)
-                    ? Icon(Icons.check_box)
-                    : Icon(Icons.check_box_outline_blank),
+                    icon: isEveryMedicineTaken(moment.medicines)
+                        ? Icon(Icons.check_box)
+                        : Icon(Icons.check_box_outline_blank),
 
                     onPressed: () {
-                      final currentTakenState = areAllMedicineTaken(moment.medicines);
+                      final currentTakenState =
+                          isEveryMedicineTaken(moment.medicines);
 
                       setState(() {
-                        for (var med in moment.medicines){
+                        for (var med in moment.medicines) {
                           med.taken = !currentTakenState;
                         }
                       });
@@ -65,7 +63,6 @@ class _HomeState extends State<Home> {
             ),
           );
         },
-
         itemComparator: (element1, element2) {
           final moment1 = element1 as Moment;
           final moment2 = element2 as Moment;
@@ -75,7 +72,7 @@ class _HomeState extends State<Home> {
     );
   }
 
-  bool areAllMedicineTaken(List<Medicine> medicines) {
+  bool isEveryMedicineTaken(List<Medicine> medicines) {
     var taken = true;
 
     for (final med in medicines) {
@@ -88,11 +85,11 @@ class _HomeState extends State<Home> {
     return taken;
   }
 
-  int convertToDateInt(DateTime dateTime){
+  int convertToDateInt(DateTime dateTime) {
     return (dateTime.year * 100 + dateTime.month) * 100 + dateTime.day;
   }
 
-  String intConvertToDateTime(int dateInt){
+  String intConvertToDateTime(int dateInt) {
     int day = dateInt % 100;
     int yearAndMonth = dateInt ~/ 100;
     int month = yearAndMonth % 100;
