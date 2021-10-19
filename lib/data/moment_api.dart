@@ -1,24 +1,6 @@
-
-
 import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-//
-// class MyIcon {
-//   static const ALARM = Icons.alarm;
-//   static const BUSINESS = Icons.business_center;
-//   static const BOOKMARK = Icons.class_;
-//   static const BREAKFAST = Icons.free_breakfast;
-//   static const HOME = Icons.home;
-//   static const PHARMACY = Icons.local_pharmacy;
-// }
-
-class Checkbox {
-  static const empty = "checkbox_empty";
-  static const checkedWhite = "checkbox_checked_white";
-  static const checkedGreen = "checkbox_checked_green";
-}
 
 class Medicine {
   final String name;
@@ -39,8 +21,6 @@ class Moment {
 
 
 class MomentApi {
-
-  //https://stackoverflow.com/a/56252864 should use intl package
   static final _dateFormat = DateFormat("yyyy-MM-dd HH:mm");
 
   static DateTime _dateTimeFromString(String dateStr){
@@ -69,16 +49,16 @@ class MomentApi {
         [Medicine("Acebutol", _randomBool())]
     );
   }
-  
+
   static Moment atWork(String day){
     return Moment(
         "Op 't werk",
         _dateTimeFromString("2019-01-$day 15:00"),
-        Icon(Icons.business_center), 
+        Icon(Icons.business_center),
         [Medicine("Paracetamol", _randomBool())]
     );
   }
-  
+
   static Moment bedTime(String day){
     return Moment(
         "Voor het slapen",
