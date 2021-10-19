@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:grouped_list/grouped_list.dart';
-import 'package:intl/intl.dart';
 import 'package:wolf_test/data/moment_api.dart';
+import 'package:wolf_test/utils/custom_expansion_tile.dart';
 import 'package:wolf_test/utils/date_time_extensions.dart';
 
 class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
+
   @override
   State<Home> createState() => _HomeState();
 }
@@ -18,7 +20,7 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Wolfpack assessment"),
+        title: const Text("Wolfpack assessment"),
       ),
       //grouped list library link: https://pub.dev/packages/grouped_list
       //grouped by int, because in Dart no date class and it is easier to group by int like yyyyMMdd
@@ -27,43 +29,13 @@ class _HomeState extends State<Home> {
         groupBy: (element) => convertToDateInt((element as Moment).date),
 
         groupSeparatorBuilder: (dateTimeInt) => Padding(
-            padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
           child: Text(intConvertToDateTime(dateTimeInt)),
         ),
 
         itemBuilder: (context, dynamic element) {
-
           var moment = element as Moment;
-          return Card(
-            color: areAllMedicineTaken(moment.medicines) ? Colors.blueAccent : Colors.white,
-
-            child: ListTile(
-              title: Text(moment.title),
-              subtitle: Text(moment.date.printTime()),
-              leading: moment.icon,
-              trailing: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    //By Assessment: Clicking on the checkbox for the moment simply sets all medicines to the same value
-                    icon: areAllMedicineTaken(moment.medicines)
-                    ? Icon(Icons.check_box)
-                    : Icon(Icons.check_box_outline_blank),
-
-                    onPressed: () {
-                      final currentTakenState = areAllMedicineTaken(moment.medicines);
-
-                      setState(() {
-                        for (var med in moment.medicines){
-                          med.taken = !currentTakenState;
-                        }
-                      });
-                    },
-                  )
-                ],
-              ),
-            ),
-          );
+          return _buildExpandableTile(moment);
         },
 
         itemComparator: (element1, element2) {
@@ -99,5 +71,70 @@ class _HomeState extends State<Home> {
     int year = yearAndMonth ~/ 100;
     final dateTime = DateTime(year, month, day);
     return dateTime.printDate();
+  }
+
+  Widget _buildExpandableTile(Moment moment){
+    return CustomExpansionTile(
+        onExpansionChanged: (value){
+          moment.isCollapsed = !value;
+        },
+        hasIcon: false,
+        initiallyExpanded: !moment.isCollapsed,
+        title: Card(
+          color: areAllMedicineTaken(moment.medicines) ? Colors.grey : Colors.white,
+
+          child: ListTile(
+            title: Text(moment.title),
+            subtitle: Text(moment.date.printTime()),
+            leading: moment.icon,
+            trailing: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: areAllMedicineTaken(moment.medicines)
+                      ? const Icon(Icons.check_box)
+                      : const Icon(Icons.check_box_outline_blank),
+
+                  onPressed: () {
+                    final currentTakenState = areAllMedicineTaken(moment.medicines);
+
+                    setState(() {
+                      for (var med in moment.medicines){
+                        med.taken = !currentTakenState;
+                      }
+                    });
+                  },
+                )
+              ],
+            ),
+          ),
+        ),
+        children: moment.medicines.map((medicine) => _buildMedicineTile(medicine)).toList()
+    );
+  }
+
+  Widget _buildMedicineTile(Medicine medicine) {
+    return ListTile(
+        title: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+          child: Text(medicine.name)
+        ),
+        trailing: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: medicine.taken
+                  ? const Icon(Icons.check_box)
+                  : const Icon(Icons.check_box_outline_blank),
+
+              onPressed: () {
+                setState(() {
+                  medicine.taken = !medicine.taken;
+                });
+              },
+            )
+          ],
+        ),
+    );
   }
 }

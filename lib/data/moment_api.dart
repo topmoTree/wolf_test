@@ -85,7 +85,6 @@ class MomentApi {
         _dateTimeFromString("2019-01-$day 22:00"),
         Icon(Icons.alarm),
         [Medicine("Melatonin")]
-
     );
   }
 

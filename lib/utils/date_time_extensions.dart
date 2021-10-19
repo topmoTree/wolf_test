@@ -15,10 +15,3 @@ extension DateTimeExt on DateTime{
     return _dateFormat.format(this);
   }
 }
-
-extension DateTimeString on String{
-
-  //todo later add some check
-  DateTime convertToDateTime() =>
-      _dateTimeFormat.parse(this);
-}
