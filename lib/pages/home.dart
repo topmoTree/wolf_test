@@ -81,7 +81,7 @@ class _HomeState extends State<Home> {
         iconColor: Colors.black,
         initiallyExpanded: !moment.isCollapsed,
         title: Card(
-          color: areAllMedicineTaken(moment.medicines)
+          color: isEveryMedicineTaken(moment.medicines)
               ? Colors.grey
               : Colors.white,
           child: ListTile(
@@ -92,7 +92,7 @@ class _HomeState extends State<Home> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  icon: areAllMedicineTaken(moment.medicines)
+                  icon: isEveryMedicineTaken(moment.medicines)
                       ? const Icon(
                           Icons.check_box,
                           color: Colors.white,
@@ -100,7 +100,7 @@ class _HomeState extends State<Home> {
                       : const Icon(Icons.check_box_outline_blank),
                   onPressed: () {
                     final currentTakenState =
-                        areAllMedicineTaken(moment.medicines);
+                        isEveryMedicineTaken(moment.medicines);
 
                     setState(() {
                       for (var med in moment.medicines) {
@@ -118,7 +118,7 @@ class _HomeState extends State<Home> {
             .toList());
   }
 
-  bool areAllMedicineTaken(List<Medicine> medicines) {
+  bool isEveryMedicineTaken(List<Medicine> medicines) {
     var taken = true;
 
     for (final med in medicines) {
