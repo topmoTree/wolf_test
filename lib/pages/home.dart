@@ -75,6 +75,8 @@ class _HomeState extends State<Home> {
           moment.isCollapsed = !value;
         },
         hasIcon: false,
+        textColor: Colors.black,
+        iconColor: Colors.black,
         initiallyExpanded: !moment.isCollapsed,
         title: Card(
           color: areAllMedicineTaken(moment.medicines)
