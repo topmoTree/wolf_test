@@ -17,43 +17,45 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Wolfpack assessment"),
-      ),
-      //grouped list library link: https://pub.dev/packages/grouped_list
-      //grouped by int, because in Dart no date class and it is easier to group by int like yyyyMMdd
-      body: GroupedListView<dynamic, int>(
-        elements: moments,
-        groupBy: (element) => convertToDateInt((element as Moment).date),
-        groupSeparatorBuilder: (dateTimeInt) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
-          child: Text(intConvertToDateTime(dateTimeInt)),
-        ),
-        itemBuilder: (context, dynamic element) {
-          var moment = element as Moment;
-          return _buildExpandableTile(moment);
-        },
-        itemComparator: (element1, element2) {
-          final moment1 = element1 as Moment;
-          final moment2 = element2 as Moment;
-          return moment1.date.compareTo(moment2.date);
-        },
-      ),
-    );
+    return MaterialApp(
+        home: DefaultTabController(
+            length: 2,
+            child: Scaffold(
+                appBar: AppBar(
+                  title: const Text("Wolfpack assessment"),
+                  bottom: const TabBar(
+                    tabs: [
+                      Tab(icon: Icon(Icons.list_alt)),
+                      Tab(icon: Icon(Icons.calendar_today))
+                    ],
+                  ),
+                ),
+                body: TabBarView(children: [
+                  _buildListOfMoments(),
+                  _buildWeekAmountMedicine(),
+                ]))));
   }
 
-  bool areAllMedicineTaken(List<Medicine> medicines) {
-    var taken = true;
-
-    for (final med in medicines) {
-      if (!med.taken) {
-        taken = false;
-        break;
-      }
-    }
-
-    return taken;
+  Widget _buildListOfMoments() {
+    //grouped list library link: https://pub.dev/packages/grouped_list
+    //grouped by int, because in Dart no date class and it is easier to group by int like yyyyMMdd
+    return GroupedListView<dynamic, int>(
+      elements: moments,
+      groupBy: (element) => convertToDateInt((element as Moment).date),
+      groupSeparatorBuilder: (dateTimeInt) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+        child: Text(intConvertToDateTime(dateTimeInt)),
+      ),
+      itemBuilder: (context, dynamic element) {
+        var moment = element as Moment;
+        return _buildExpandableTile(moment);
+      },
+      itemComparator: (element1, element2) {
+        final moment1 = element1 as Moment;
+        final moment2 = element2 as Moment;
+        return moment1.date.compareTo(moment2.date);
+      },
+    );
   }
 
   int convertToDateInt(DateTime dateTime) {
@@ -69,7 +71,7 @@ class _HomeState extends State<Home> {
     return dateTime.printDate();
   }
 
-  Widget _buildExpandableTile(Moment moment) {
+  _buildExpandableTile(Moment moment) {
     return CustomExpansionTile(
         onExpansionChanged: (value) {
           moment.isCollapsed = !value;
@@ -116,11 +118,28 @@ class _HomeState extends State<Home> {
             .toList());
   }
 
+  bool areAllMedicineTaken(List<Medicine> medicines) {
+    var taken = true;
+
+    for (final med in medicines) {
+      if (!med.taken) {
+        taken = false;
+        break;
+      }
+    }
+
+    return taken;
+  }
+
   Widget _buildMedicineTile(Medicine medicine) {
     return ListTile(
       title: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),
           child: Text(medicine.name)),
+      subtitle: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 10.0),
+          child: Text(
+              "${medicine.tabletsQty} tablets, ${medicine.milligramsPerTablet} mg")),
       trailing: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -140,5 +159,60 @@ class _HomeState extends State<Home> {
         ],
       ),
     );
+  }
+
+  Widget _buildWeekAmountMedicine() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          const Text("January 7 - 14",
+              style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Text("Amount of tablets: ${calculateTablets(moments)}",
+              style: const TextStyle(fontSize: 18.0)),
+          const SizedBox(height: 10),
+          Text("Milligrams: ${calculateMilligrams(moments)}",
+              style: const TextStyle(fontSize: 18.0))
+        ],
+      ),
+    );
+  }
+
+  ///Calculate amount of tablets from 07.01.19 to 14.01.19
+  int calculateTablets(List<Moment> moments) {
+    var tablets = 0;
+    var startDate = DateTime(2019, 01, 07);
+    var finishDate = DateTime(2019, 01, 14);
+
+    for (var moment in moments) {
+      if (moment.date.isAfter(startDate) && moment.date.isBefore(finishDate)) {
+        for (var medicine in moment.medicines) {
+          if (medicine.taken) tablets += medicine.tabletsQty;
+        }
+      }
+    }
+
+    return tablets;
+  }
+
+  ///Calculate milligrams amount from 07.01.19 to 14.01.19
+  int calculateMilligrams(List<Moment> moments) {
+    var mg = 0;
+    var startDate = DateTime(2019, 01, 07);
+    var finishDate = DateTime(2019, 01, 14);
+
+    for (var moment in moments) {
+      if (moment.date.isAfter(startDate) && moment.date.isBefore(finishDate)) {
+        for (var medicine in moment.medicines) {
+          if (medicine.taken) {
+            mg += medicine.tabletsQty * medicine.milligramsPerTablet;
+          }
+        }
+      }
+    }
+
+    return mg;
   }
 }
